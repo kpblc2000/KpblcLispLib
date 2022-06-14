@@ -118,15 +118,7 @@
     ) ;_ end of apply
   ) ;_ end of defun
 
-  (foreach source_path (vl-remove-if-not
-                         (function (lambda (x) x))
-                         (mapcar (function (lambda (path)
-                                             (fun_browsefiles-in-directory-nested path "*.lsp")
-                                           ) ;_ end of lambda
-                                 ) ;_ end of function
-                                 (cdr (assoc "source" param-list))
-                         ) ;_ end of mapcar
-                       ) ;_ end of vl-remove-if-not
+  (foreach source_path (cdr (assoc "source" param-list))
     (fun_load-lsp source_path)
   ) ;_ end of foreach
 
