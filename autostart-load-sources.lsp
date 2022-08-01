@@ -1,8 +1,7 @@
 (vl-load-com)
 
-(defun _kpblc-load-sources (param-list              /                       fun_progress-start      fun_progress-cmd        fun_progress-end
-                            fun_progess-continue    fun_load-lsp            fun_browsefiles-in-directory-nested             source_list
-                            msg                     pos
+(defun _kpblc-load-sources (param-list / fun_progress-start fun_progress-cmd fun_progress-end fun_progess-continue fun_load-lsp
+                            fun_browsefiles-in-directory-nested source_list msg pos
                            )
                            ;|
   *    Загрузка исходных кодов
@@ -190,6 +189,11 @@
       (_kpblc-load-sources
         (list (cons "source" (vl-remove "" (fun_conv-string-to-list source_folders ";"))))
       ) ;_ end of _kpblc-load-sources
+
+      (if _kpblc-autoload-autostart
+        (_kpblc-autoload-autostart)
+        (princ "\nОтсутствует автостартер")
+      ) ;_ end of if
     ) ;_ end of progn
   ) ;_ end of if
 
