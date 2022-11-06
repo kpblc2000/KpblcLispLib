@@ -2,11 +2,18 @@
                            ;|
 *    ¬ыравнивает строку до указанной длины
 *    ѕараметры вызова:
-  string  обрабатываема€ строка. ѕередаваемое значение в строку преобразовываетс€
-  str-len  нужна€ результирующа€ длина строки
-  sym  добавл€емый символ (строка, длиной 1)
-  is-left  добавл€ет слева (t) или справа (nil)
+  string  ; обрабатываема€ строка. ѕередаваемое значение в строку преобразовываетс€
+  str-len ;  нужна€ результирующа€ длина строки
+  sym     ; добавл€емый символ (строка, длиной 1)
+  is-left ; добавл€ет слева (t) или справа (nil)
+*    Align string to required length
+*    Call params:
+  string  ; string to proceed. Converts to string if requires
+  str-len ; result string length
+  sym     ; symbol to append
+  is-left ; append to left (t) or to right (nil)
 *    ѕримеры вызова:
+*    Call samples:
 (_kpblc-string-align "121" 20 "0" T)   ; "00000000000000000121"
 (_kpblc-string-align "121" 20 "0" NIL) ; "12100000000000000000"
 (_KPBLC-STRING-ALIGN nil 3 "0" t)      ; "000"

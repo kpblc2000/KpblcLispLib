@@ -1,6 +1,11 @@
 (defun _kpblc-conv-value-to-string (value /)
                                    ;|
   *    конвертация значения в строку.
+  *    Convert value to string
+  *    Параметры вызова:
+    value ; преобразовываемое значение
+  *    Call params:
+    value ; value to convert
   |;
   (cond
     ((= (type value) 'str) value)
