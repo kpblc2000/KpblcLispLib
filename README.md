@@ -11,6 +11,8 @@
 Если захотите поощрить - кошелек ЮMoney 4100142180849
 
 Отдельная благодарность Дмитрию Гаврилину за дополнительный контроль кодов и Евгению Елпанову за дополнения кодов.
+===
+Все файлы записываются в кодировке ANSI (Windows-1251). Если видите нечитаемые символы, смените кодировку в редакторе
 
 ===
 
@@ -25,3 +27,5 @@ Only files in subfolder \lsp will be loaded
 If you want to encourage - YuMoney wallet 4100142180849
 
 Special thanks to Dmitry Gavrilin for additional code control and Evgeny Elpanov for code additions.
+===
+All files are saved at ANSI (Windows-1251) encoding. In case you got unrecognized symbols you need to change enconding in your editor / IDE
