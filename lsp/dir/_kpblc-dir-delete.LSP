@@ -2,7 +2,11 @@
                          ;|
 *    Удаляет каталог
 *    Параметры вызова
-  path  удаляемый каталог, строка
+  path  ; удаляемый каталог, строка
+  
+*    Erases directory
+*    Parameters
+  path  ; directory to erase
 |;
   (if (_kpblc-find-file-or-dir path)
     (progn (_kpblc-error-catch
