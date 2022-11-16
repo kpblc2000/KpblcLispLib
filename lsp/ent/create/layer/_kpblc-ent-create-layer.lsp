@@ -1,104 +1,89 @@
-(defun _kpblc-ent-create-layer (key lst / sub res tmp name subkey)
+(defun _kpblc-ent-create-layer (name param-list / sub res tmp)
                                ;|
-*    Функция создания слоя по ключу (имени) и доп.параметрам
+*    Функция создания слоя по имени и доп.параметрам
 *    Параметры вызова:
-  key   ; ключ для поиска настроек в (cdr(assoc"layers"(vl-bb-ref '*kpblc-settings*))) либо имя создаваемого слоя
-  lst   ; Список свойств создаваемого слоя
-    '(("color" . <Цвет>) ; ICA либо RGB. nil -> 7
+  name         ; Имя создаваемого слоя
+  param-list   ; Список свойств создаваемого слоя
+    '(("color" . <Цвет>) ; ICA. nil -> 7. Для задания RGB надо передавать список Red Green Blue
       ("lineweight" . <Вес>); nil -> 9
       ("linetype" . <Тип>) ; nil -> "Continuous"
+      ("linetypefile" . <Файл, откуда грузить описания типов линий>) ; nil -> acadiso.lin
       ("description" . <Описание>) ; nil -> не меняется для существующего или "" для нового слоя
+      ("where" . <Указатель на документ, в котором надо создавать слой>) ; nil -> текущий документ
+      ("noplot" . <Печатать или нет>) ; nil -> слой будет печататься
+      ("update" . <Обновлять настройки слоя>) ; nil -> Если слой существует, он будет оставлен "как есть". t -> настройки слоя будут приведены к переданным в param-list
       )
+*    Примеры вызова:
+(_kpblc-ent-create-layer "qwer" nil)
+(_kpblc-ent-create-layer "qwer1" '(("color" . 8)))
+(_kpblc-ent-create-layer "qwer2" '(("color" 120 80 30)))
+(_kpblc-ent-create-layer "qwer2" '(("color" 120 80 50) ("update" . t)))
 |;
-  (_kpblc-error-catch
-    (function
-      (lambda ()
-        (if (and (setq subkey (if (= (type key) 'str)
-                                (car (_kpblc-conv-string-to-list key (_kpblc-get-sep-layer-name)))
-                                key
-                              ) ;_ end of if
-                 ) ;_ end of setq
-                 (setq sub (cond ((cdr (assoc subkey (cdr (assoc "layers" (vl-bb-ref '*kpblc-settings*))))))
-                                 ((cdar (vl-remove-if-not
-                                          (function (lambda (x) (= (strcase subkey) (strcase (cadr x)))))
-                                          (cdr (assoc "layers" (vl-bb-ref '*kpblc-settings*)))
-                                        ) ;_ end of vl-remove-if-not
-                                  ) ;_ end of car
-                                 )
-                           ) ;_ end of cond
-                 ) ;_ end of setq
-            ) ;_ end of and
-          (progn (setq res (vla-add (vla-get-layers *kpblc-adoc*)
-                                    (setq name (if (_kpblc-is-layer-contour key)
-                                                 (strcat (car sub) (_kpblc-get-sep-layer-name) (_kpblc-get-mark-from-filename))
-                                                 (car sub)
-                                               ) ;_ end of if
-                                    ) ;_ end of setq
-                           ) ;_ end of vla-add
-                 ) ;_ end of setq
-                 (vla-put-name res name)
-                 (vla-put-color res (cadr sub))
-                 (vla-put-lineweight
-                   res
-                   (cond ((caddr sub))
-                         (t aclnwtbylwdefault)
-                   ) ;_ end of cond
-                 ) ;_ end of vla-put-lineweight
-          ) ;_ end of progn
-          (progn (setq res (vla-add (vla-get-layers *kpblc-adoc*) key))
-                 (vla-put-linetype
-                   res
-                   (_kpblc-linetype-load
-                     *kpblc-adoc*
-                     (cond ((cdr (assoc "linetype" lst)))
-                           ((cdr (assoc "lt" lst)))
-                     ) ;_ end of cond
-                     nil
-                   ) ;_ end of _KPBLC-LINETYPE-LOAD
-                 ) ;_ end of vla-put-linetype
-                 (vla-put-lineweight
-                   res
-                   (cond ((cdr (assoc "lineweight" lst)))
-                         ((cdr (assoc "lw" lst)))
-                         (t aclnwt009)
-                   ) ;_ end of cond
-                 ) ;_ end of vla-put-lineweight
-                 (cond ((and (cdr (assoc "color" lst)) (listp (cdr (assoc "color" lst))))
-                        ((lambda (/ c)
-                           (setq c (vla-get-truecolor res))
-                           (vla-setrgb
-                             c
-                             (cadr (assoc "color" lst))
-                             (_kpblc-conv-value-to-int (caddr (assoc "color" lst)))
-                             (_kpblc-conv-value-to-int (cadddr (assoc "color" lst)))
-                           ) ;_ end of vla-SetRGB
-                         ) ;_ end of lambda
-                        )
-                       )
-                       ((cdr (assoc "color" lst)) (vla-put-color res (cdr (assoc "color" lst))))
-                       (t (vla-put-color res 7))
-                 ) ;_ end of cond
-          ) ;_ end of progn
+  (if (and name (= (type name) 'str))
+    (progn
+
+      (foreach elem (list '("color" . 7)
+                          '("lineweight" . 9)
+                          '("linetype" . "Continuous")
+                          '("linetypefile" . "acadiso.lin")
+                          (cons "where" *kpblc-adoc*)
+                    ) ;_ end of list
+        (if (not (cdr (assoc (car elem) param-list)))
+          (setq param-list (cons elem param-list))
         ) ;_ end of if
-        (if res
-          (progn (if (cdr (assoc "description" lst))
-                   (vla-put-description res (cdr (assoc "description" lst)))
-                 ) ;_ end of if
-                 (vla-put-layeron res :vlax-true)
-                 (vla-put-lock res :vlax-false)
-                 (vl-catch-all-apply (function (lambda () (vla-put-freeze res :vlax-false))))
-          ) ;_ end of progn
-        ) ;_ end of if
-        res
-      ) ;_ end of lambda
-    ) ;_ end of function
-    '(lambda (x)
-       (_kpblc-error-print (strcat "Создание слоя " key) x)
-       (if res
-         (vl-catch-all-apply (function (lambda () (vla-delete res))))
-       ) ;_ end of if
-       (setq res nil)
-     ) ;_ end of lambda
-  ) ;_ end of _kpblc-error-catch
+      ) ;_ end of foreach
+
+      (if (/= (type (vl-catch-all-apply
+                      (function (lambda () (vla-item (vla-get-layers (cdr (assoc "where" param-list))) name)))
+                    ) ;_ end of vl-catch-all-apply
+              ) ;_ end of type
+              'vla-object
+          ) ;_ end of /=
+        (setq param-list (_kpblc-list-add-or-subst param-list "update" t))
+      ) ;_ end of if
+
+
+      (_kpblc-error-catch
+        (function
+          (lambda ()
+
+            (setq res (vla-add (vla-get-layers (cdr (assoc "where" param-list))) name))
+
+            (if (cdr (assoc "update" param-list))
+              (progn
+                (if (= (type (cdr (assoc "color" param-list))) 'list)
+                  (apply (function _kpblc-ent-modify-truecolor-set)
+                         (cons res (cdr (assoc "color" param-list)))
+                  ) ;_ end of apply
+                  (vla-put-color res (max 1 (_kpblc-conv-value-to-int (cdr (assoc "color" param-list)))))
+                ) ;_ end of if
+                (vla-put-lineweight res (cdr (assoc "lineweight" param-list)))
+                (vla-put-linetype
+                  res
+                  (_kpblc-linetype-load
+                    (cdr (assoc "where" param-list))
+                    (cdr (assoc "linetype" lst))
+                    (cdr (assoc "linetypefile" param-list))
+                  ) ;_ end of _kpblc-linetype-load
+                ) ;_ end of vla-put-linetype
+                (vla-put-plottable res (_kpblc-conv-value-bool-to-vla (not (cdr (assoc "noplot" param-list)))))
+                (if (cdr (assoc "description" lst))
+                  (vla-put-description res (cdr (assoc "description" lst)))
+                ) ;_ end of if
+              ) ;_ end of progn
+            ) ;_ end of if
+            res
+          ) ;_ end of lambda
+        ) ;_ end of function
+        '(lambda (x)
+           (_kpblc-error-print (strcat "Создание слоя " name) x)
+           (if res
+             (vl-catch-all-apply (function (lambda () (vla-delete res))))
+           ) ;_ end of if
+           (setq res nil)
+         ) ;_ end of lambda
+      ) ;_ end of _kpblc-error-catch
+    ) ;_ end of progn
+  ) ;_ end of if
   res
 ) ;_ end of defun
