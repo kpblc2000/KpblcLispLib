@@ -62,13 +62,13 @@
                   res
                   (_kpblc-linetype-load
                     (cdr (assoc "where" param-list))
-                    (cdr (assoc "linetype" lst))
+                    (cdr (assoc "linetype" param-list))
                     (cdr (assoc "linetypefile" param-list))
                   ) ;_ end of _kpblc-linetype-load
                 ) ;_ end of vla-put-linetype
                 (vla-put-plottable res (_kpblc-conv-value-bool-to-vla (not (cdr (assoc "noplot" param-list)))))
-                (if (cdr (assoc "description" lst))
-                  (vla-put-description res (cdr (assoc "description" lst)))
+                (if (cdr (assoc "description" param-list))
+                  (vla-put-description res (cdr (assoc "description" param-list)))
                 ) ;_ end of if
               ) ;_ end of progn
             ) ;_ end of if
