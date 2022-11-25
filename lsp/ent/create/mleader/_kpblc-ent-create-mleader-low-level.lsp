@@ -1,4 +1,4 @@
-(defun _kpblc-ent-create-mleader-low-lelev (lst / res)
+(defun _kpblc-ent-create-mleader-low-level (lst / res)
                                            ;|
 *    Создает мультивыноску с текстовой аннотацией
 *    Параметры вызова:
