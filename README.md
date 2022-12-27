@@ -26,6 +26,8 @@
 
 Еще один, видео: https://youtu.be/DFCO_QW-cJ4
 
+Если все равно ничего не получается - https://forum.dwg.ru/showthread.php?t=167228
+
 ===
 
 AutoLISP/VisualLISP function library by kpblc
