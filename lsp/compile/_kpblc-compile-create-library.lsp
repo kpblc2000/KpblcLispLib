@@ -56,18 +56,29 @@
 
       (foreach file source_list
         (_kpblc-progress-continue msg (setq file_count (1+ file_count)))
-        (setq handle (open base_file_name "a"))
-        (if (>= progn_count 250)
+        (if (not (vl-catch-all-error-p
+                   (vl-catch-all-apply
+                     (function (lambda ()
+                                 (load file)
+                               ) ;_ end of lambda
+                     ) ;_ end of function
+                   ) ;_ end of vl-catch-all-apply
+                 ) ;_ end of vl-catch-all-error-p
+            ) ;_ end of not
           (progn
-            (write-line "\n\n)(progn" handle)
-            (setq progn_count 0)
+            (setq handle (open base_file_name "a"))
+            (if (>= progn_count 250)
+              (progn
+                (write-line "\n\n)(progn" handle)
+                (setq progn_count 0)
+              ) ;_ end of progn
+            ) ;_ end of if
+
+            (write-line (strcat "\n\n;;; File : " file) handle)
+            (close handle)
+            (_kpblc-file-copy-lisp-no-format file base_file_name '(("mode" . "a")))
           ) ;_ end of progn
         ) ;_ end of if
-
-        (write-line (strcat "\n\n;;; File : " file) handle)
-        (close handle)
-        (_kpblc-file-copy-lisp-no-format file base_file_name '(("mode" . "a")))
-
       ) ;_ end of foreach
 
       (_kpblc-progress-end)
