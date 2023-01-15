@@ -1,4 +1,4 @@
-(defun _kpblc-compile-create-library (param-list / source_list file_count progn_count msg base_file_name handle)
+(defun _kpblc-compile-create-library (param-list / sysvar source_list file_count progn_count msg base_file_name handle)
                                      ;|
   *  Собирает все исходники в один lsp-файл
   *  Параметры вызова:
@@ -48,6 +48,9 @@
   (if (not (findfile base_file_name))
     (progn
       (_kpblc-dir-create (vl-filename-directory base_file_name))
+
+      (setq sysvar (_kpblc-error-sysvar-save-by-list '(("secureload" . 0) ("sysmon" . 0))))
+
       (setq handle (open base_file_name "w"))
       (write-line "(progn" handle)
       (close handle)
@@ -74,9 +77,12 @@
               ) ;_ end of progn
             ) ;_ end of if
 
-            (write-line (strcat "\n\n;;; File : " file) handle)
+            (write-line (strcat "\n\n;;; File : " file "\n(progn") handle)
             (close handle)
             (_kpblc-file-copy-lisp-no-format file base_file_name '(("mode" . "a")))
+            (setq handle (open base_file_name "a"))
+            (write-line ")" handle)
+            (close handle)
           ) ;_ end of progn
         ) ;_ end of if
       ) ;_ end of foreach
@@ -88,6 +94,8 @@
       (close handle)
     ) ;_ end of progn
   ) ;_ end of if
+
+  (_kpblc-error-sysvar-restore-by-list sysvar)
 
   (if (findfile base_file_name)
     base_file_name
