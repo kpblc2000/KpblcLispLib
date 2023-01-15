@@ -68,9 +68,7 @@
                  )
                  ((= bit 2) ; savedate
                   (if (or (not (findfile dest))
-                          (and (or (and _kpblc-get-md5 (/= (_kpblc-get-md5 source) (_kpblc-get-md5 dest)))
-                                   (/= (_kpblc-get-file-date source) (_kpblc-get-file-date dest))
-                               ) ;_ end of or
+                          (and (/= (_kpblc-get-file-date source) (_kpblc-get-file-date dest))
                                (vl-file-delete dest)
                           ) ;_ end of and
                       ) ;_ end of or
@@ -79,9 +77,7 @@
                  )
                  ((= bit 3) ; update + savedate
                   (if (or (not (findfile dest))
-                          (or (and _kpblc-get-md5 (/= (_kpblc-get-md5 source) (_kpblc-get-md5 dest)))
-                              (> (_kpblc-get-file-date source) (_kpblc-get-file-date dest))
-                          ) ;_ end of or
+                          (> (_kpblc-get-file-date source) (_kpblc-get-file-date dest))
                       ) ;_ end of or
                     (progn (if (findfile dest)
                              (vl-file-delete dest)
