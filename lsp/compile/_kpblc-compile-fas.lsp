@@ -59,6 +59,9 @@
          (if (_kpblc-find-file-or-dir fas_folder)
            (_kpblc-dir-delete fas_folder)
          ) ;_ end of if
+
+         (_kpblc-dir-create fas_folder)
+
          (if (or (not
                    (vl-file-copy
                      (strcat prj_file ".fas")
