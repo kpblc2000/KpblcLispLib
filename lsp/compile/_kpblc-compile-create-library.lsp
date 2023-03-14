@@ -1,4 +1,4 @@
-(defun _kpblc-compile-create-library (param-list / sysvar source_list file_count progn_count msg base_file_name handle)
+(defun _kpblc-compile-create-library (param-list / sysvar source_list first_folder file_count progn_count msg base_file_name handle)
                                      ;|
   *  Собирает все исходники в один lsp-файл
   *  Параметры вызова:
@@ -6,25 +6,26 @@
       '(("excl" . <Маска имен файлов, исключаемых из обработки>) ; nil => обрабатывать все. Регистронезависимо. Строка
        )
   |;
-  (setq source_list (vl-remove-if
-                      (function (lambda (x) (or (not x) (= (vl-string-trim x " ") ""))))
-                      (_kpblc-conv-string-to-list
-                        (vl-registry-read "HKEY_CURRENT_USER\\Software\\kpblcLispLib" "Source")
-                        ";"
-                      ) ;_ end of _kpblc-conv-string-to-list
-                    ) ;_ end of vl-remove-if
-        source_list (cons (strcat (car source_list) "\\lsp")
-                          (cdr source_list)
-                    ) ;_ end of cons
-        source_list (apply (function append)
-                           (mapcar
-                             (function (lambda (folder)
-                                         (_kpblc-browsefiles-in-directory-nested folder "*.lsp")
-                                       ) ;_ end of lambda
-                             ) ;_ end of function
-                             source_list
-                           ) ;_ end of mapcar
-                    ) ;_ end of apply
+  (setq source_list  (vl-remove-if
+                       (function (lambda (x) (or (not x) (= (vl-string-trim x " ") ""))))
+                       (_kpblc-conv-string-to-list
+                         (vl-registry-read "HKEY_CURRENT_USER\\Software\\kpblcLispLib" "Source")
+                         ";"
+                       ) ;_ end of _kpblc-conv-string-to-list
+                     ) ;_ end of vl-remove-if
+        source_list  (cons (strcat (car source_list) "\\lsp")
+                           (cdr source_list)
+                     ) ;_ end of cons
+        first_folder (car source_list)
+        source_list  (apply (function append)
+                            (mapcar
+                              (function (lambda (folder)
+                                          (_kpblc-browsefiles-in-directory-nested folder "*.lsp")
+                                        ) ;_ end of lambda
+                              ) ;_ end of function
+                              source_list
+                            ) ;_ end of mapcar
+                     ) ;_ end of apply
   ) ;_ end of setq
   (if (cdr (assoc "excl" param-list))
     (setq source_list
@@ -98,7 +99,18 @@
   (_kpblc-error-sysvar-restore-by-list sysvar)
 
   (if (findfile base_file_name)
-    base_file_name
+    (progn
+      (_kpblc-file-copy
+        base_file_name
+        (strcat (_kpblc-dir-path-no-splash (vl-filename-directory first_folder))
+                "\\united_lisp\\"
+                (vl-filename-base base_file_name)
+                (vl-filename-extension base_file_name)
+        ) ;_ end of strcat
+        '(("update" . t))
+      ) ;_ end of _kpblc-file-copy
+      base_file_name
+    ) ;_ end of progn
   ) ;_ end of if
 
 ) ;_ end of defun
