@@ -1,7 +1,12 @@
-(defun _kpblc-acad-version-string ()
-                                  ;|
-  *    ѕолучение версии AutoCAD в виде строки
+(defun _kpblc-acad-version-string () 
+  ;|
+  *    ѕолучение версии AutoCAD / nanoCad в виде строки
   *    ¬озвращает строковое представление текущей версии AutoCAD
   |;
-  (itoa (atoi (vl-string-trim "VISUALP " (strcase (ver)))))
+  (atoi 
+    (if (_kpblc-is-app-ncad) 
+      (vla-get-version (vlax-get-acad-object))
+      (vl-string-trim "VISUALP " (strcase (ver)))
+    )
+  )
 ) ;_ end of defun

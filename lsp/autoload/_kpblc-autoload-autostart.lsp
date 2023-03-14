@@ -1,5 +1,5 @@
-(defun _kpblc-autoload-autostart ()
-                                 ;|
+(defun _kpblc-autoload-autostart () 
+  ;|
   *    Назначение глобальных переменных уровня документа
   |;
   (setq *kpblc-acad*  (vlax-get-acad-object)
@@ -8,6 +8,10 @@
   ) ;_ end of setq
 ) ;_ end of defun
 
-(if (or (not *kpblc-acad*) (not *kpblc-adoc*) (not *kpblc-model*))
-  (_kpblc-autoload-autostart)
-) ;_ end of if
+((lambda () 
+   (if (or (not *kpblc-acad*) (not *kpblc-adoc*) (not *kpblc-model*)) 
+     (_kpblc-autoload-autostart)
+   ) ;_ end of if
+   (princ)
+ ) 
+)
