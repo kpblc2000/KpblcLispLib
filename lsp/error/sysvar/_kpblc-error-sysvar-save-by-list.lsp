@@ -8,19 +8,7 @@
   *    Возвращает список из пар (<Переменная> . <Начальное значение>)
   |;
 
-  (setq silence (if (_kpblc-is-app-ncad)
-                  (mapcar
-                    (function
-                      (lambda (x / temp)
-                        (setq temp (getvar (car x)))
-                        (setvar (car x) (cdr x))
-                        (cons (car x) temp)
-                      ) ;_ end of lambda
-                    ) ;_ end of function
-                    '(("cmdecho" . 0) ("nomutt" . 1))
-                  ) ;_ end of mapcar
-                ) ;_ end of if
-  ) ;_ end of setq
+  (setq silence (_kpblc-error-sysvar-set-silence))
 
   (setq res (vl-remove nil
                        (mapcar (function (lambda (x / tmp)
@@ -38,17 +26,8 @@
             ) ;_ end of vl-remove
   ) ;_ end of setq
 
-  (if silence
-    (foreach sysvar (vl-remove-if
-                      (function
-                        (lambda (x)
-                          (member (car x) (mapcar (function car) sysvar-list))
-                        ) ;_ end of lambda
-                      ) ;_ end of function
-                      silence
-                    ) ;_ end of vl-remove-if
-      (setvar (car sysvar) (cdr sysvar))
-    ) ;_ end of foreach
-  ) ;_ end of if
+  (_kpblc-error-sysvar-restore-silence sysvar-list silence)
+
+  res
 
 ) ;_ end of defun
