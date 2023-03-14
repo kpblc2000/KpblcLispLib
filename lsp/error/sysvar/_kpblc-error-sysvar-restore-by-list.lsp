@@ -8,9 +8,9 @@
   |;
   (setq silence (_kpblc-error-sysvar-set-silence))
 
-  (foreach item (_kpblc-conv-list-to-list sysvar-list)
+  (foreach item sysvar-list
     (if (getvar (car item))
-      (setvar (car item) (cadr item))
+      (setvar (car item) (cdr item))
     ) ;_ end of if
   ) ;_ end of foreach
 
